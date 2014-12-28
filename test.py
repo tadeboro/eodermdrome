@@ -280,8 +280,37 @@ def main():
                       None, "a"))
 
     # Main loop
-    out = p.run("110111")
-    print(out)
+    p.run("110111")
+
+    # BCT interpreter
+    p = Program()
+    p.add_cmd(Command(None              , "thequickbrownfoxjumpsoverthelazydog",
+                      "Program: "       , "miewehit"))
+    p.add_cmd(Command("1"               , "byanad",
+                      None              , "buguramat"))
+    p.add_cmd(Command("0"               , "byanad",
+                      None              , "buramat"))
+    p.add_cmd(Command("\n"              , "sehened",
+                      "Data: "          , "sihiabruramat"))
+    p.add_cmd(Command("\n"              , "ianadabar",
+                      "Running: "       , "iamtmabar"))
+    p.add_cmd(Command(None              , "abrand",
+                      "end.\n"          , "a"))
+    p.add_cmd(Command(None              , "psewelklihiandnabarfrux",
+                      "1 appended, "    , "chewelisksiamtmaybobyargruz"))
+    p.add_cmd(Command(None              , "psewelklihiandnarfryx",
+                      "1 not appended, ", "chewelisksiamtmargrux"))
+    p.add_cmd(Command(None              , "scewelklihiandnabarfrux",
+                      "0 appended, "    , "wheliosokoiamtmaybyargruz"))
+    p.add_cmd(Command(None              , "scewelklihiandnarfryx",
+                      "0 not appended, ", "wheliosokoiamtmargrux"))
+    p.add_cmd(Command(None              , "sceweihiandnarfrux",
+                      "1 deleted, "     , "sowoieheiamtmaur"))
+    p.add_cmd(Command(None              , "sceweihiandnarfryx",
+                      "0 deleted, "     , "sowoieheiamtmaurux"))
+
+    ## Main loop
+    p.run("00111\n101\n")
 
 if __name__ == "__main__":
     debug = len(sys.argv) > 1
