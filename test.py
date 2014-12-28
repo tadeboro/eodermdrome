@@ -97,6 +97,9 @@ class Graph:
             es.extend([(k, b) for b in v])
         return es
 
+    def deg(self, n):
+        return len(self.edges[n])
+
     def render(self, fname):
         g = gv.Graph(format = "png", engine = "neato")
         g.graph_attr["overlap"] = "false"
@@ -234,7 +237,7 @@ def search(graph, subgraph, assignments, possible_assignments):
     for j in tmp_assignments:
         if j not in possible_assignments[i]:
             continue
-        if j not in assignments:
+        if j not in assignments and subgraph.deg(i) <= graph.deg(j):
             assignments.append(j)
             # Create a new set of possible assignments, where graph node j
             # is the only possibility for the assignment of subgraph node i.
@@ -247,10 +250,16 @@ def search(graph, subgraph, assignments, possible_assignments):
         update_possible_assignments(graph, subgraph, possible_assignments)
 
 def find_isomorphism(graph, subgraph):
-    assignments = []
+    # Prepare initial available assignments
     possible_assignments = []
+    degs = [graph.deg(i) for i in range(graph.n_vertices)]
     for i in range(subgraph.n_vertices):
-        possible_assignments.append(list(range(graph.n_vertices)))
+        possible_assignments.append([])
+        for j in range(graph.n_vertices):
+            if subgraph.deg(i) <= degs[j]:
+                possible_assignments[i].append(j)
+    # Start search
+    assignments = []
     if search(graph, subgraph, assignments, possible_assignments):
         return assignments
     return None
