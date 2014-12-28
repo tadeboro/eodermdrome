@@ -29,13 +29,12 @@ class Program:
         self.g.render("exec0")
         counter = 1
         moved = True
-        output = ""
         while moved:
             moved = False
             for index, cmd in enumerate(self.commands):
                 log("TRY EXEC: " + str(index))
                 # Check if command can be executed
-                if input[:len(cmd.input)] != cmd.input:
+                if cmd.input and input[:len(cmd.input)] != cmd.input:
                     continue
                 log("INPUT OK. TRY ISO ...")
                 map = find_isomorphism (self.g, cmd.match)
@@ -43,8 +42,10 @@ class Program:
                     continue
                 # Execute command
                 log("EXEC: " + str(index))
-                input = input[len(cmd.input):]
-                output += cmd.output
+                if cmd.input:
+                    input = input[len(cmd.input):]
+                if cmd.output:
+                    print(cmd.output)
                 new_map = self.g.remove_internals(cmd.match, map)
                 log("NEW_MAP: " + str(new_map))
                 log("CMD_MAP: " + str(cmd.map))
@@ -56,7 +57,6 @@ class Program:
                 # Inform loop that we're still moving
                 moved = True
                 counter += 1
-        return output
 
 class Graph:
     def __init__(self, s):
@@ -270,14 +270,14 @@ def find_isomorphism(graph, subgraph):
 def main():
     # Load program
     p = Program()
-    p.add_cmd(Command("" , "thequickbrownfoxjumpsoverthelazydog",
-                      "" , "abcahijikilihdefgd"))
-    p.add_cmd(Command("1", "abcahdhijikil",
-                      "" , "abcahijikilihmnonpnqnmd"))
-    p.add_cmd(Command("" , "abcahijikilihmnonpnqnmd",
-                      "1", "abcahdhijikil"))
-    p.add_cmd(Command("0", "a",
-                      "" , "a"))
+    p.add_cmd(Command(None, "thequickbrownfoxjumpsoverthelazydog",
+                      None, "abcahijikilihdefgd"))
+    p.add_cmd(Command("1" , "abcahdhijikil",
+                      None, "abcahijikilihmnonpnqnmd"))
+    p.add_cmd(Command(None, "abcahijikilihmnonpnqnmd",
+                      "1" , "abcahdhijikil"))
+    p.add_cmd(Command("0" , "a",
+                      None, "a"))
 
     # Main loop
     out = p.run("110111")
