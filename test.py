@@ -1,9 +1,61 @@
+#!/usr/bin/env python3
+
 import graphviz as gv
 import sys
+import cProfile
 
 def log(msg):
     if debug:
         print(msg)
+
+class Command:
+    def __init__(self, input, match, output, replace):
+        self.input = input
+        self.match = LabeledGraph(match)
+        self.output = output
+        self.replace = LabeledGraph(replace)
+        self.map = self.match.get_mapping(self.replace)
+
+class Program:
+    def __init__(self):
+        self.g = Graph("thequickbrownfoxjumpsoverthelazydog")
+        self.commands = []
+
+    def add_cmd(self, cmd):
+        self.commands.append(cmd)
+
+    def run(self, input):
+        self.g.render("exec0")
+        counter = 1
+        moved = True
+        output = ""
+        while moved:
+            moved = False
+            for index, cmd in enumerate(self.commands):
+                log("TRY EXEC: " + str(index))
+                log(self.g.n_vertices)
+                # Check if command can be executed
+                if input[:len(cmd.input)] != cmd.input:
+                    continue
+                map = find_isomorphism (self.g, cmd.match)
+                if not map:
+                    continue
+                # Execute command
+                log("EXEC: " + str(index))
+                input = input[len(cmd.input):]
+                output += cmd.output
+                new_map = self.g.remove_internals(map)
+                log("NEW_MAP: " + str(new_map))
+                log("CMD_MAP: " + str(cmd.map))
+                rep_map = {cmd.map[k]: v for k, v in new_map.items()
+                               if cmd.map.get(k, None) is not None}
+                log("REP_MAP: " + str(rep_map))
+                self.g.insert(cmd.replace, rep_map)
+                self.g.render("exec" + str(counter))
+                # Inform loop that we're still moving
+                moved = True
+                counter += 1
+        return output
 
 class Graph:
     def __init__(self, s):
@@ -16,6 +68,7 @@ class Graph:
             return {}
         # First vertex is special
         l2i = {s[0]: 0}
+        self.edges[0] = set()
         counter = 1
         ix = 0
         for i in range(1, len(s)):
@@ -45,7 +98,7 @@ class Graph:
         return es
 
     def render(self, fname):
-        g = gv.Graph(format = "png", engine = "dot")
+        g = gv.Graph(format = "png", engine = "neato")
         g.graph_attr["overlap"] = "false"
         g.graph_attr["splines"] = "true"
         g.graph_attr["remincross"] = "true"
@@ -95,6 +148,8 @@ class Graph:
         for i in range(self.n_vertices):
             log("POSSIBLE REPLACEMENT: " + str(i))
             if i in deleted:
+                while j in deleted:
+                    j -= 1
                 log("DOING REPLACEMENT: " + str(j) + " -> " + str(i))
                 # Replace destination in all edges
                 for x in self.edges.values():
@@ -116,7 +171,7 @@ class LabeledGraph(Graph):
         self.i2l = {v: k for k, v in self.l2i.items()}
 
     def render(self, fname):
-        g = gv.Graph(format = "png", engine = "dot")
+        g = gv.Graph(format = "png", engine = "neato")
         g.graph_attr["overlap"] = "false"
         g.graph_attr["splines"] = "true"
         g.graph_attr["remincross"] = "true"
@@ -201,43 +256,22 @@ def find_isomorphism(graph, subgraph):
     return None
 
 def main():
-    # Test 1
-    g = Graph("abcdedfgfbhihd")
-    s = LabeledGraph("abcdaec")
-    r = LabeledGraph("acbcd")
+    # Load program
+    p = Program()
+    p.add_cmd(Command("" , "thequickbrownfoxjumpsoverthelazydog",
+                      "" , "abcahijikilihdefgd"))
+    p.add_cmd(Command("1", "abcahdhijikil",
+                      "" , "abcahijikilihmnonpnqnmd"))
+    p.add_cmd(Command("" , "abcahijikilihmnonpnqnmd",
+                      "1", "abcahdhijikil"))
+    p.add_cmd(Command("0", "a",
+                      "" , "a"))
 
-    g.render("xxx0")
-    s2r_map = s.get_mapping(r)
-    log(s2r_map)
-    mapping = find_isomorphism(g, s)
-    log(mapping)
-    new_mapping = g.remove_internals(mapping)
-    log(new_mapping)
-    log(g.n_vertices)
-    rep_mapping = {s2r_map[k]: v for k, v in new_mapping.items() if s2r_map.get(k, None)}
-    log(rep_mapping)
-    g.insert(r, rep_mapping)
-    g.render("xxx1")
-
-    # Test 2
-    #g = Graph("abcade")
-    #s = LabeledGraph("dabca")
-    #r = LabeledGraph("deabca")
-
-    #g.render("test0")
-    #s2r_map = s.get_mapping(r)
-    #log(s2r_map)
-    #for i in range(1, 6):
-    #    mapping = find_isomorphism(g, s)
-    #    log(mapping)
-    #    new_mapping = g.remove_internals(mapping)
-    #    log(new_mapping)
-    #    log(g.n_vertices)
-    #    rep_mapping = {s2r_map[k]: v for k, v in new_mapping.items()}
-    #    log(rep_mapping)
-    #    g.insert(r, rep_mapping)
-    #    g.render("test" + str(i))
+    # Main loop
+    out = p.run("110111")
+    print(out)
 
 if __name__ == "__main__":
     debug = len(sys.argv) > 1
+    #cProfile.run("main()")
     main()
