@@ -2,7 +2,6 @@
 
 import graphviz as gv
 import sys
-import cProfile
 
 def log(msg):
     if debug:
@@ -15,6 +14,8 @@ class Command:
         self.output = output
         self.replace = LabeledGraph(replace)
         self.map = self.match.get_mapping(self.replace)
+        self.match.open = set(self.map.keys())
+        self.replace.open = set(self.map.values())
 
 class Program:
     def __init__(self):
@@ -33,10 +34,10 @@ class Program:
             moved = False
             for index, cmd in enumerate(self.commands):
                 log("TRY EXEC: " + str(index))
-                log(self.g.n_vertices)
                 # Check if command can be executed
                 if input[:len(cmd.input)] != cmd.input:
                     continue
+                log("INPUT OK. TRY ISO ...")
                 map = find_isomorphism (self.g, cmd.match)
                 if not map:
                     continue
@@ -44,7 +45,7 @@ class Program:
                 log("EXEC: " + str(index))
                 input = input[len(cmd.input):]
                 output += cmd.output
-                new_map = self.g.remove_internals(map)
+                new_map = self.g.remove_internals(cmd.match, map)
                 log("NEW_MAP: " + str(new_map))
                 log("CMD_MAP: " + str(cmd.map))
                 rep_map = {cmd.map[k]: v for k, v in new_map.items()
@@ -128,22 +129,23 @@ class Graph:
         for a, b in r.get_edges():
             self.add_edge(map[a], map[b])
 
-    def remove_internals(self, assignments):
+    def remove_internals(self, subgraph, assignments):
         new_assignments = {}
-        destinations = frozenset(assignments)
         deleted = set()
         for s, g in enumerate(assignments):
-            if self.edges[g] <= destinations:
+            if s in subgraph.open:
+                # Remove all connections between assigned nodes
+                for e in subgraph.adjacencies(s):
+                    if assignments[e] in self.edges[g]:
+                        self.edges[g].remove(assignments[e])
+                new_assignments[s] = g
+            else:
                 # Remove vertex g
                 deleted.add(g)
                 for x in self.edges[g]:
                     if g in self.edges[x]:
                         self.edges[x].remove(g)
                 del self.edges[g]
-            else:
-                # Remove all connections between assigned nodes
-                self.edges[g] -= destinations
-                new_assignments[s] = g
         # Reenumerate graph and adjust assignments
         log("DELETED: " + str(deleted))
         j = self.n_vertices - 1
@@ -202,8 +204,8 @@ def do_infeasible_removal(graph, subgraph, possible_assignments):
         for j in possible_assignments[i]:
             for x in subgraph.adjacencies(i):
                 match = False
-                for y in range(0, graph.n_vertices):
-                    if y in possible_assignments[x] and graph.has_edge(j,y):
+                for y in graph.adjacencies(j):
+                    if y in possible_assignments[x]:
                         match = True
                         break
                 if not match:
@@ -256,7 +258,8 @@ def find_isomorphism(graph, subgraph):
     for i in range(subgraph.n_vertices):
         possible_assignments.append([])
         for j in range(graph.n_vertices):
-            if subgraph.deg(i) <= degs[j]:
+            deg = subgraph.deg(i)
+            if (i in subgraph.open and deg <= degs[j]) or deg == degs[j]:
                 possible_assignments[i].append(j)
     # Start search
     assignments = []
@@ -282,5 +285,4 @@ def main():
 
 if __name__ == "__main__":
     debug = len(sys.argv) > 1
-    #cProfile.run("main()")
     main()
