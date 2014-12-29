@@ -3,7 +3,6 @@
 from pyparsing import Suppress, Optional, CharsNotIn, Word, \
         QuotedString, ZeroOrMore, stringEnd
 from program import Command, Program
-from sys import argv
 
 def parse(path):
     # Comments
@@ -27,10 +26,3 @@ def parse(path):
 
     # Run parser
     return prog.parseFile(path)[0]
-
-# Standalone parser invocation
-if __name__ == "__main__":
-    if len(argv) < 2:
-        print("Usage: " + argv[0] + " FILE")
-    else:
-        parse(argv[1])
