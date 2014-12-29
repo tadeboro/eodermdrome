@@ -50,7 +50,7 @@ class Program:
         if cmd.input:
             input = input[len(cmd.input):]
         if cmd.output:
-            print(cmd.output)
+            print(cmd.output, end = "")
         new_map = self.g.remove_internals(cmd.match, map)
         rep_map = {cmd.map[k]: v for k, v in new_map.items()
                        if cmd.map.get(k, None) is not None}
