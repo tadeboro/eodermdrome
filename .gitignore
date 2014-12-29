@@ -2,3 +2,7 @@
 *.gv
 *.pdf
 .*.swp
+*.pyc
+dist
+build
+*.egg-info
