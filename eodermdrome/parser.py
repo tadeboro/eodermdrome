@@ -2,7 +2,7 @@
 
 from pyparsing import Suppress, Optional, CharsNotIn, Word, \
         QuotedString, ZeroOrMore, stringEnd
-from program import Command, Program
+from eodermdrome.program import Command, Program
 
 def parse(path):
     # Comments

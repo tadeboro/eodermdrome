@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from graph import Graph, LabeledGraph
+from eodermdrome.graph import Graph, LabeledGraph
 
 class Command:
     def __init__(self, input, match, output, replace):
