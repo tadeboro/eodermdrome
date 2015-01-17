@@ -50,6 +50,10 @@ class Graph:
         g.graph_attr["overlap"] = "false"
         g.graph_attr["splines"] = "true"
         g.graph_attr["remincross"] = "true"
+        g.graph_attr["size"] = "12,12!"
+        g.graph_attr["dpi"] = "100"
+        g.node_attr["shape"]= "point"
+        g.edge_attr["len"]= "0.3"
         for a, b in self.get_edges():
             if a < b:
                 g.edge(str(a), str(b))
