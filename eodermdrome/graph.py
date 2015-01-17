@@ -57,6 +57,8 @@ class Graph:
         for a, b in self.get_edges():
             if a < b:
                 g.edge(str(a), str(b))
+        else:
+            g.node("0")
         g.render(fname + ".gv")
 
     def adjacencies(self, n):
