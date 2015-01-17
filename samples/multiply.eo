@@ -1,0 +1,55 @@
+, Initialize state
+       .   .-.
+  ? -> |\  | |
+       .-.-.-.
+,
+thequickbrownfoxjumpsoverthelazydog abcadefgd
+
+, Read in first number
+  .          .   .-.
+  |\     ->  |\  |
+  .-.-a      .-.-.-a
+,
+(1) abcdb (Read 1
+) aghihgjklj
+
+, Start stop reading first number
+  .          .-. .   .
+  |\         |/|  \ /
+  .-.-a  ->  .-.-.-.-a
+,
+(0) abcdb (Done reading first number
+) aijikimnopqoqn
+
+, Start moving back if we need another round of sumation
+  .-. .   .      .-. . . .
+  |/|  \ /   ->  |/|  \|/ 
+  .-.-.-.-a      .-.-.-.-a
+,
+(1) abcbdbefghigif (Start moving back
+) ajkjljmjnopqrpro
+
+, Actually move one step back
+    . . .            . . .
+     \|/              \|/ 
+  j-.-.-.-a  ->  j-.-.-.-.-a
+        |          |
+        .-.        .-.
+,
+abcdcbefegeheij (Move back one step
+) aklkmknkopqrqpj
+
+, Start moving forvard
+  . . .        .   .
+   \|/          \ /
+  a-.-.-.  ->  a-.-.-.
+      | |          | |
+      .-.          .-.
+,
+abcbdbebfghif (Start moving forvard
+) ajkjljmnopm
+
+, Move one step forward
+,
+abcbdbefghgfi (Add 1 to result
+) ajklkjmnmompi
